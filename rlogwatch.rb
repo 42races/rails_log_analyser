@@ -9,11 +9,15 @@ class Analyser
 
     puts "Processing #{log_dir.entries.size-2} log files"
 
+    i = 0
     log_dir.entries.sort.drop(2).each do |log|
       puts "Analysing #{@logdir}/#{log}"
       contents = File.read("#{@logdir}/#{log}")
       tokens = contents.split
       parse(tokens)
+
+      i += 1
+      break if i == 4
     end
 
     print_stats
@@ -25,7 +29,10 @@ class Analyser
 
   def print_stats
     puts 'statistics'
-    keys = @info.keys.sort
+    keys = @info.keys.sort do |key1, key2|
+      (@info[key1].total_duration/@info[key1].count) <=> (@info[key2].total_duration/@info[key2].count)
+    end
+
     keys.each do |key|
       value = @info[key]
       puts "#{key} request count = #{value.count}"
